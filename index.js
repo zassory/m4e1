@@ -1,228 +1,54 @@
-const { Pool } = require('pg');
-const Cursor = require('pg-cursor');
-const assert = require('assert');
+const {
+    pool
+} = require("./dataBase.js");
 
-const pool = new Pool({
-    user: 'zasory',
-    host: 'localhost',
-    database: 'practica_db',
-    password: 'Hakxf2n5$',
-    port: 5432,
-});
+// const insertUser = async() => {
+//     const [email,firstname,lastname,age] = process.argv.slice(2);
+//     try{
+//         const res = await pool.query(
+//             "INSERT INTO usuarios(email,firstname,lastname,age) values($1,$2,$3,$4)",
+//             [email,firstname,lastname,age]
+//         );
+//         console.log(`Se ha agregado el usuario ${firstname}`);
 
-const buscarMayores = async() => {
+//     }catch(error){
+//         console.error(error);
+//     }
+// }
+//insertUser();
 
+// const getAllUsers = async() => {
+//     try{
+//         const res = await pool.query("SELECT * FROM usuarios");
+//         console.table(res.rows);
+//     }catch(error){
+//         console.error(error);
+//     }
+// }
+
+// getAllUsers();
+
+// const modifyUser = async() => {
+//     const [id,email] = process.argv.slice(2);
+//     try{
+//         const res = await pool.query("UPDATE usuarios SET email = $1 WHERE id= $2",[email,id]);
+//         console.log(`Se han actualizado el usuario ${id} con el nuevo correo ${email}`);
+//     }
+//     catch(error){
+//         console.error(error);
+//     }
+// }
+
+// modifyUser()
+
+const deleteUser = async() => {
+    const [id] = process.argv.slice(2);
     try{
 
-        const client = await pool.connect();
-        const cursor = client.query(new Cursor("SELECT * FROM estudiantes WHERE edad > '25'"));
-
-        let rows = await cursor.read(2);
-        //console.log(row);
-        while(rows.length){
-            console.table(rows);
-            console.log(rows.length);
-            console.assert(rows.length == 2);
-            rows = await cursor.read(2);
-        }
+        const res = await pool.query("DELETE FROM usuarios WHERE id = ${1}",[id]);
+        console.log(`Se ha eliminado correctamente el usuario con id: ${id}`);
 
     }catch(error){
-        switch(error.code){
-            case '42601':
-                console.log("\n ERROR! \n Error de Sintaxis\n");
-                break;
-            case '25P01':
-                console.log("\n ERROR! \n Password inválido\n");
-                break;
-            case '08003':
-                console.log("\n ERROR! \n Conexion intexistente\n");
-                break;
-            case '08006':
-                console.log("\n ERROR! \n Conexion falló\n");
-                break;
-            case '2F002':
-                console.log("\n ERROR! \n Sin permisos para modificar\n");
-                break;
-            case '57P03':
-                console.log("\n ERROR! \n Error en la conexion\n");
-                break;
-            case '42501':
-                console.log("\n ERROR! \n Privilegios insuficientes\n");
-                break;
-            case '42602':
-                console.log("\n ERROR! \n Nombre inválido\n");
-                break;
-            case '42622':
-                console.log("\n ERROR! \n Nombre demasiado largo\n");
-                break;
-            case '42939':
-                console.log("\n ERROR! \n Nombre reservado\n");
-                break;
-            case '42703':
-                console.log("\n ERROR! \n Columna indefinida\n");
-                break;
-            case '42000':
-                console.log("\n ERROR! \n Syntaxis error o violacion de acceso\n");
-                break;
-            case '42P01':
-                console.log("\n ERROR! \n Tabla no definida\n");
-                break;
-            case '42P02':
-                console.log("\n ERROR! \n Parametro no definida\n");
-                break;
-            default:
-                console.error(error.stack);
-                console.log(error.code);
-        }
-    }
-    finally{
-        console.log('Terminado');
+        console.error(error);
     }
 }
-
-//buscarMayores();
-
-const buscarEstudiantesDesc = async() => {
-
-    try{
-
-        const client = await pool.connect();
-        const cursor = client.query(new Cursor("SELECT * FROM estudiantes ORDER BY apellidos DESC"));
-
-        let rows = await cursor.read(2);
-        //console.log(row);
-        while(rows.length){
-            console.table(rows);
-            console.log(rows.length);
-            console.assert(rows.length == 2);
-            rows = await cursor.read(2);
-        }
-
-    }catch(error){
-        switch(error.code){
-            case '42601':
-                console.log("\n ERROR! \n Error de Sintaxis\n");
-                break;
-            case '25P01':
-                console.log("\n ERROR! \n Password inválido\n");
-                break;
-            case '08003':
-                console.log("\n ERROR! \n Conexion intexistente\n");
-                break;
-            case '08006':
-                console.log("\n ERROR! \n Conexion falló\n");
-                break;
-            case '2F002':
-                console.log("\n ERROR! \n Sin permisos para modificar\n");
-                break;
-            case '57P03':
-                console.log("\n ERROR! \n Error en la conexion\n");
-                break;
-            case '42501':
-                console.log("\n ERROR! \n Privilegios insuficientes\n");
-                break;
-            case '42602':
-                console.log("\n ERROR! \n Nombre inválido\n");
-                break;
-            case '42622':
-                console.log("\n ERROR! \n Nombre demasiado largo\n");
-                break;
-            case '42939':
-                console.log("\n ERROR! \n Nombre reservado\n");
-                break;
-            case '42703':
-                console.log("\n ERROR! \n Columna indefinida\n");
-                break;
-            case '42000':
-                console.log("\n ERROR! \n Syntaxis error o violacion de acceso\n");
-                break;
-            case '42P01':
-                console.log("\n ERROR! \n Tabla no definida\n");
-                break;
-            case '42P02':
-                console.log("\n ERROR! \n Parametro no definida\n");
-                break;
-            default:
-                console.error(error.stack);
-                console.log(error.code);
-        }
-    }
-    finally{
-        console.log('Terminado');
-    }
-}
-
-//buscarEstudiantesDesc();
-
-const buscarCursosDisponibles = async() => {
-
-    try{
-
-        const client = await pool.connect();
-        const cursor = client.query(new Cursor("SELECT * FROM cursos"));
-
-        let rows = await cursor.read(2);
-        //console.log(row);
-        while(rows.length){
-            console.table(rows);
-            console.log(rows.length);
-            console.assert(rows.length == 2);
-            rows = await cursor.read(2);
-        }
-
-    }catch(error){
-        switch(error.code){
-            case '42601':
-                console.log("\n ERROR! \n Error de Sintaxis\n");
-                break;
-            case '25P01':
-                console.log("\n ERROR! \n Password inválido\n");
-                break;
-            case '08003':
-                console.log("\n ERROR! \n Conexion intexistente\n");
-                break;
-            case '08006':
-                console.log("\n ERROR! \n Conexion falló\n");
-                break;
-            case '2F002':
-                console.log("\n ERROR! \n Sin permisos para modificar\n");
-                break;
-            case '57P03':
-                console.log("\n ERROR! \n Error en la conexion\n");
-                break;
-            case '42501':
-                console.log("\n ERROR! \n Privilegios insuficientes\n");
-                break;
-            case '42602':
-                console.log("\n ERROR! \n Nombre inválido\n");
-                break;
-            case '42622':
-                console.log("\n ERROR! \n Nombre demasiado largo\n");
-                break;
-            case '42939':
-                console.log("\n ERROR! \n Nombre reservado\n");
-                break;
-            case '42703':
-                console.log("\n ERROR! \n Columna indefinida\n");
-                break;
-            case '42000':
-                console.log("\n ERROR! \n Syntaxis error o violacion de acceso\n");
-                break;
-            case '42P01':
-                console.log("\n ERROR! \n Tabla no definida\n");
-                break;
-            case '42P02':
-                console.log("\n ERROR! \n Parametro no definida\n");
-                break;
-            default:
-                console.error(error.stack);
-                console.log(error.code);
-        }
-    }
-    finally{
-        console.log('Terminado');
-    }
-}
-
-buscarCursosDisponibles();
-

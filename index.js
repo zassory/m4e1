@@ -45,10 +45,16 @@ const deleteUser = async() => {
     const [id] = process.argv.slice(2);
     try{
 
-        const res = await pool.query("DELETE FROM usuarios WHERE id = ${1}",[id]);
+        const res = await pool.query("DELETE FROM usuarios WHERE id = $1",[id]);
         console.log(`Se ha eliminado correctamente el usuario con id: ${id}`);
 
-    }catch(error){
-        console.error(error);
-    }
+    }catch(error){        
+        if(error.code === '42601'){
+            console.error('Error de sintaxys');
+        }else{
+            console.error(error);
+        }
+    }    
 }
+
+deleteUser();
